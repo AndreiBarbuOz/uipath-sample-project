@@ -1,0 +1,16 @@
+
+trigger:
+- master
+variables:
+- name: agent.preferPowerShellOnContainers
+  value: 'True'
+
+pool:
+  vmImage: 'windows-latest'
+container:
+  image: uipathrobot.azurecr.io/uipathrobot:latest
+  endpoint: robot-container-registry
+
+steps:
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
