@@ -1,7 +1,8 @@
-
+ 
 trigger:
 - master
 variables:
+- group: uipath-cicd
 - name: agent.preferPowerShellOnContainers
   value: 'True'
 
