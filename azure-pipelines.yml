@@ -6,20 +6,24 @@ variables:
 - name: agent.preferPowerShellOnContainers
   value: 'True'
 
-pool:
-  vmImage: 'windows-latest'
-container:
-  image: uipathrobot.azurecr.io/uipathrobot:latest
-  endpoint: robot-container-registry
+stages:
+  - stage: Build
+    displayName: Create build artifact
+    jobs:
+      - job: BuildArtifact
+        pool:
+          vmImage: 'windows-latest'
+        container:
+          image: uipathrobot.azurecr.io/uipathrobot:latest
+          endpoint: robot-container-registry
 
-steps:
-- script: C:\UiPath\UiRobot.exe pack $(Build.SourcesDirectory)\project.json -o $(Build.ArtifactStagingDirectory)\ -v 1.0.$(Build.BuildNumber)
-  displayName: 'Build the artifact'
-- publish: $(Build.ArtifactStagingDirectory)
-  artifact: drop
-- powershell: |
-    ls $(Build.ArtifactStagingDirectory)
-    Import-Module UiPath.Powershell
-    $token = Get-UiPathAuthToken -ClientId $(uatClientId) -UserKey $(uatUserKey) -AccountName $(uatAccountName) -CloudDeployment 'Production' -TenantName $(uatTenantName)
-    Add-UiPathPackage -PackageFile $(Build.ArtifactStagingDirectory)\uipath-sample.$(Build.BuildNumber).nupkg -AuthToken $token
+        steps:
+        - script: C:\UiPath\UiRobot.exe pack $(Build.SourcesDirectory)\project.json -o $(Build.ArtifactStagingDirectory)\ -v 1.0.$(Build.BuildNumber)
+          displayName: 'Build the artifact'
+        - publish: $(Build.ArtifactStagingDirectory)
+          artifact: drop
+        - powershell: |
+            Import-Module UiPath.Powershell
+            $token = Get-UiPathAuthToken -ClientId $(uatClientId) -UserKey $(uatUserKey) -AccountName $(uatAccountName) -CloudDeployment 'Production' -TenantName $(uatTenantName)
+            Add-UiPathPackage -PackageFile $(Build.ArtifactStagingDirectory)\uipath-sample.$(Build.BuildNumber).nupkg -AuthToken $token
     
