@@ -12,5 +12,7 @@ container:
   endpoint: robot-container-registry
 
 steps:
-- script: echo Hello, world!
+- script: |
+    dir
+    cd
   displayName: 'Run a one-line script'
