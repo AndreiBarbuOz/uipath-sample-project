@@ -46,3 +46,28 @@ stages:
                     Import-Module UiPath.Powershell
                     $token = Get-UiPathAuthToken -ClientId $(uatClientId) -UserKey $(uatUserKey) -AccountName $(uatAccountName) -CloudDeployment 'Production' -TenantName $(uatTenantName)
                     Add-UiPathPackage -PackageFile $(Pipeline.Workspace)\drop\uipath-sample.1.0.$(Build.BuildNumber).nupkg -AuthToken $token
+
+  - stage: DeployProd
+    displayName: Deploy build artifact to Prod
+    dependsOn: DeployUat
+    condition: succeeded()
+    jobs:
+      - deployment: deployProd
+        displayName: Deploy package to Prod Orchestrator
+        pool:
+          vmImage: "windows-latest"
+        container:
+          image: uipathrobot.azurecr.io/uipathrobot:latest
+          endpoint: robot-container-registry
+        environment: prod
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: current
+                  artifact: drop
+                  displayName: Download build artifact on build agent
+                - powershell: |
+                    Import-Module UiPath.Powershell
+                    $token = Get-UiPathAuthToken -ClientId $(prodClientId) -UserKey $(prodUserKey) -AccountName $(prodAccountName) -CloudDeployment 'Production' -TenantName $(prodTenantName)
+                    Add-UiPathPackage -PackageFile $(Pipeline.Workspace)\drop\uipath-sample.1.0.$(Build.BuildNumber).nupkg -AuthToken $token
