@@ -41,7 +41,7 @@ stages:
               steps:
                 - download: current
                   artifact: drop
-                  diplayName: Download build artifact on build agent
+                  displayName: Download build artifact on build agent
                 - powershell: |
                     Import-Module UiPath.Powershell
                     $token = Get-UiPathAuthToken -ClientId $(uatClientId) -UserKey $(uatUserKey) -AccountName $(uatAccountName) -CloudDeployment 'Production' -TenantName $(uatTenantName)
