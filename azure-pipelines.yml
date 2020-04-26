@@ -46,4 +46,3 @@ stages:
                     Import-Module UiPath.Powershell
                     $token = Get-UiPathAuthToken -ClientId $(uatClientId) -UserKey $(uatUserKey) -AccountName $(uatAccountName) -CloudDeployment 'Production' -TenantName $(uatTenantName)
                     Add-UiPathPackage -PackageFile $(Build.ArtifactStagingDirectory)\uipath-sample.1.0.$(Build.BuildNumber).nupkg -AuthToken $token
-                  displayName: Publish package to UAT Orchestrator
