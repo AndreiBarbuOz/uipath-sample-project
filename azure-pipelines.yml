@@ -21,7 +21,29 @@ stages:
             displayName: "Build the artifact"
           - publish: $(Build.ArtifactStagingDirectory)
             artifact: drop
-          - powershell: |
-              Import-Module UiPath.Powershell
-              $token = Get-UiPathAuthToken -ClientId $(uatClientId) -UserKey $(uatUserKey) -AccountName $(uatAccountName) -CloudDeployment 'Production' -TenantName $(uatTenantName)
-              Add-UiPathPackage -PackageFile $(Build.ArtifactStagingDirectory)\uipath-sample.1.0.$(Build.BuildNumber).nupkg -AuthToken $token
+
+  - stage: DeployUat
+    displayName: Deploy build artifact to UAT
+    dependsOn: Build
+    condition: succeeded()
+    jobs:
+      - deployment: deployUat
+        displayName: Deploy package to UAT Orchestrator
+        pool:
+          vmImage: "windows-latest"
+        container:
+          image: uipathrobot.azurecr.io/uipathrobot:latest
+          endpoint: robot-container-registry
+        environment: uat
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: current
+                  artifact: drop
+                  diplayName: Download build artifact on build agent
+                - powershell: |
+                    Import-Module UiPath.Powershell
+                    $token = Get-UiPathAuthToken -ClientId $(uatClientId) -UserKey $(uatUserKey) -AccountName $(uatAccountName) -CloudDeployment 'Production' -TenantName $(uatTenantName)
+                    Add-UiPathPackage -PackageFile $(Build.ArtifactStagingDirectory)\uipath-sample.1.0.$(Build.BuildNumber).nupkg -AuthToken $token
+                  displayName: Publish package to UAT Orchestrator
