@@ -45,4 +45,4 @@ stages:
                 - powershell: |
                     Import-Module UiPath.Powershell
                     $token = Get-UiPathAuthToken -ClientId $(uatClientId) -UserKey $(uatUserKey) -AccountName $(uatAccountName) -CloudDeployment 'Production' -TenantName $(uatTenantName)
-                    Add-UiPathPackage -PackageFile $(Build.ArtifactStagingDirectory)\uipath-sample.1.0.$(Build.BuildNumber).nupkg -AuthToken $token
+                    Add-UiPathPackage -PackageFile $(Pipeline.Workspace)\drop\uipath-sample.1.0.$(Build.BuildNumber).nupkg -AuthToken $token
